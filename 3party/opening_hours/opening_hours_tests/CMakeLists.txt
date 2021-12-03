@@ -6,4 +6,6 @@ set(SRC
 
 omim_add_executable(${PROJECT_NAME} ${SRC})
 
+target_include_directories(${PROJECT_NAME} PRIVATE "${OMIM_ROOT}/3party/boost")
+
 target_link_libraries(${PROJECT_NAME} opening_hours)

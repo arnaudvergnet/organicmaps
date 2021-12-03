@@ -22,45 +22,42 @@ endfunction()
 function(omim_add_executable executable)
   add_executable(${executable} ${ARGN})
   add_dependencies(${executable} BuildVersion)
+  # Enable warnings for all our binaries.
+  target_compile_options(${executable} PRIVATE ${OMIM_WARNING_FLAGS})
+
   if (USE_ASAN)
-    target_link_libraries(
-      ${executable}
-      "-fsanitize=address"
-      "-fno-omit-frame-pointer"
+    target_link_libraries(${executable}
+      -fsanitize=address
+      -fno-omit-frame-pointer
     )
   endif()
   if (USE_TSAN)
-    target_link_libraries(
-      ${executable}
-      "-fsanitize=thread"
-      "-fno-omit-frame-pointer"
+    target_link_libraries(${executable}
+      -fsanitize=thread
+      -fno-omit-frame-pointer
     )
   endif()
   if (USE_LIBFUZZER)
-    target_link_libraries(
-      ${executable}
-      "-fsanitize=fuzzer"
-    )
+    target_link_libraries(${executable} -fsanitize=fuzzer)
   endif()
   if (USE_PPROF)
     if (PLATFORM_MAC)
       find_library(PPROF_LIBRARY libprofiler.dylib)
       target_link_libraries(${executable} ${PPROF_LIBRARY})
     else()
-      target_link_libraries(${executable} "-lprofiler")
+      target_link_libraries(${executable} -lprofiler)
     endif()
   endif()
   if (USE_HEAPPROF)
     if (PLATFORM_MAC)
       find_library(HEAPPROF_LIBRARY libtcmalloc.dylib)
       if (NOT HEAPPROF_LIBRARY)
-          message(
-            FATAL_ERROR
+          message(FATAL_ERROR
             "Trying to use -ltcmalloc on MacOS, make sure that you have installed it (https://github.com/mapsme/omim/pull/12671).")
       endif()
       target_link_libraries(${executable} ${HEAPPROF_LIBRARY})
     else()
-      target_link_libraries(${executable} "-ltcmalloc")
+      target_link_libraries(${executable} -ltcmalloc)
     endif()
   endif()
   if (USE_PCH)
@@ -68,9 +65,13 @@ function(omim_add_executable executable)
   endif()
 endfunction()
 
+set(OMIM_WARNING_FLAGS -Wall -Wextra -Wno-unused-parameter)
+
 function(omim_add_library library)
   add_library(${library} ${ARGN})
   add_dependencies(${library} BuildVersion)
+  # Enable warnings for all our libraries.
+  target_compile_options(${library} PRIVATE ${OMIM_WARNING_FLAGS})
   if (USE_PPROF AND PLATFORM_MAC)
     find_path(PPROF_INCLUDE_DIR NAMES gperftools/profiler.h)
     target_include_directories(${library} SYSTEM PUBLIC ${PPROF_INCLUDE_DIR})

@@ -20,6 +20,8 @@ set(
 
 omim_add_library(${PROJECT_NAME} ${SRC})
 
+target_include_directories(${PROJECT_NAME} PRIVATE "${OMIM_ROOT}/3party/boost")
+
 omim_add_test_subdirectory(tracking_tests)
 
 if (USE_LIBFUZZER)

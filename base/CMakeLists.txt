@@ -101,6 +101,8 @@ set(SRC
 
 omim_add_library(${PROJECT_NAME} ${SRC})
 
+target_include_directories(${PROJECT_NAME} PUBLIC "${OMIM_ROOT}/3party/boost")
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 target_link_libraries(${PROJECT_NAME} INTERFACE Threads::Threads)

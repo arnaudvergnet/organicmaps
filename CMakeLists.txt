@@ -90,7 +90,7 @@ endif()
 option(USE_ASAN "Enable Address Sanitizer" OFF)
 option(USE_TSAN "Enable Thread Sanitizer" OFF)
 option(USE_LIBFUZZER "Enable LibFuzzer" OFF)
-option(PYBINDINGS "Create makefiles for building python bindings" OFF)
+option(PYBINDINGS "Create makefiles for building python bindings" ON)
 option(SKIP_DESKTOP "Skip building of desktop application" OFF)
 # TODO: Fix mapshot, it doesn't work without our old FreeType hack.
 option(BUILD_MAPSHOT "Build mapshot tool" OFF)
@@ -139,7 +139,7 @@ endif()
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-# Set environment variables
+### Set environment variables
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -177,18 +177,26 @@ endif()
 if (NOT SKIP_TESTS)
   set(SKIP_TESTS FALSE)
 endif()
-
-if (NOT PYTHON_VERSION)
-  # FDroid build server has 3.5.3 Python installed.
-  set(PYTHON_VERSION 3.5)
-endif()
-
-# End of setting environment variables
+### End of setting environment variables
 
 find_package(Threads REQUIRED)
 
-# Cannot call it at the beginning of the file because it depends on PYTHON_VERSION.
-include(BundledBoost)
+if (PYBINDINGS)
+  find_package(Python3 COMPONENTS Interpreter Development)
+else()
+  find_package(Python3 COMPONENTS Interpreter)
+endif()
+
+if (Python3_Interpreter_FOUND)
+  message("Found python to use in qt/, shaders/ and 3party/: ${Python3_EXECUTABLE}")
+else()
+  message(FATAL_ERROR "Could not find python3 to use in qt/, shaders/ and 3party/.")
+endif()
+
+# Boost requires python interpreter.
+#include(BundledBoost)
+# TODO: Remove
+add_compile_options(-Wno-unused-parameter)
 
 # Scripts
 
@@ -288,19 +296,6 @@ add_subdirectory(3party/vulkan_wrapper)
 
 if (PLATFORM_DESKTOP)
   add_subdirectory(3party/libtess2)
-endif()
-
-# Only options related to warnings should be placed here.
-# Other options should be set before all add_subdirectory calls.
-add_compile_options(
-  "-Wall"
-)
-
-find_package(Python3 COMPONENTS Interpreter)
-if (Python3_Interpreter_FOUND)
-  message("Found python to use in qt/, shaders/ and 3party/: ${Python3_EXECUTABLE}")
-else()
-  message(FATAL_ERROR "Could not find python3 to use in qt/, shaders/ and 3party/.")
 endif()
 
 add_subdirectory(base)

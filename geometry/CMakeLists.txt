@@ -77,6 +77,8 @@ endif()
 
 omim_add_library(${PROJECT_NAME} ${SRC})
 
+target_include_directories(${PROJECT_NAME} PUBLIC "${OMIM_ROOT}/3party/boost")
+
 target_link_libraries(${PROJECT_NAME} base)
 
 omim_add_test_subdirectory(geometry_tests)

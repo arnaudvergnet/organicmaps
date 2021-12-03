@@ -11,6 +11,8 @@
 #include <cstdint>
 #include <string>
 
+#include <unistd.h>  // _SC_PAGESIZE
+
 using namespace std;
 
 UNIT_TEST(FilesContainer_Smoke)
@@ -331,7 +333,7 @@ UNIT_TEST(FilesMappingContainer_PageSize)
 
   size_t const pageSize =
 #ifndef OMIM_OS_WINDOWS
-      sysconf(_SC_PAGE_SIZE);
+      sysconf(_SC_PAGESIZE);
 #else
       4096;
 #endif

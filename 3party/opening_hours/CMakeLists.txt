@@ -19,7 +19,10 @@ set(SRC
 
 omim_add_library(${PROJECT_NAME} ${SRC})
 
-target_include_directories(${PROJECT_NAME} INTERFACE .)
+target_include_directories(${PROJECT_NAME}
+  INTERFACE .
+  PRIVATE "${OMIM_ROOT}/3party/boost"
+)
 
 omim_add_test_subdirectory(opening_hours_tests)
 omim_add_test_subdirectory(opening_hours_integration_tests)

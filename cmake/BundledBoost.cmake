@@ -36,21 +36,14 @@ endfunction()
 function(setup_bundled_boost_with_python)
   if (Python3_VERSION)
     string(REPLACE "." "" BOOST_PYTHON_LIBNAME ${Python3_VERSION})
-    # Quote from https://cmake.org/cmake/help/v3.16/module/FindBoost.html:
-    #   "Note that Boost Python components require a Python version
-    #   suffix (Boost 1.67 and later), e.g. python36 or python27 for the
-    #   versions built against Python 3.6 and 2.7, respectively."
     string(SUBSTRING ${BOOST_PYTHON_LIBNAME} 0 2 BOOST_PYTHON_LIBNAME)
     string(CONCAT BOOST_PYTHON_LIBNAME "python" ${BOOST_PYTHON_LIBNAME})
-  endif()
-
-  if (NOT DEFINED BOOST_PYTHON_LIBNAME)
-    message(FATAL_ERROR "Could not determine Boost.Python library name from PYTHON_VERSION=" ${PYTHON_VERSION})
-  else()
     message("Boost.Python library name: " ${BOOST_PYTHON_LIBNAME})
+  else()
+    message(FATAL_ERROR "Could not determine Boost.Python library name from Python3_VERSION=" ${Python3_VERSION})
   endif()
 
-  find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS ${BOOST_PYTHON_LIBNAME})
+  find_package(Boost ${BOOST_VERSION} EXACT REQUIRED COMPONENTS python35) #${BOOST_PYTHON_LIBNAME}
   find_package(PythonInterp ${PYTHON_VERSION} REQUIRED)
   include_directories(${PYTHON_INCLUDE_DIR})
 
@@ -63,9 +56,10 @@ endfunction()
 
 # End of functions.
 
-set(BOOST_VERSION 1.76)
+set(BOOST_VERSION 1.78)
 set(Boost_NO_SYSTEM_PATHS ON)
 set(BOOST_ROOT "${OMIM_ROOT}/3party/boost")
+set(BOOST_INCLUDEDIR "${BOOST_ROOT}")
 set(BOOST_LIBRARYDIR "${BOOST_ROOT}/stage/lib")
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)

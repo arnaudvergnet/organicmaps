@@ -27,3 +27,5 @@ set(SRC
 )
 
 add_library(${PROJECT_NAME} ${SRC})
+
+target_include_directories(${PROJECT_NAME} PUBLIC "${OMIM_ROOT}/3party/boost")
