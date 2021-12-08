@@ -42,10 +42,6 @@ public class EditorHostFragment extends BaseMwmToolbarFragment
                              implements OnBackPressListener, View.OnClickListener, LanguagesFragment.Listener
 {
   private boolean mIsNewObject;
-  @Nullable
-  private View mToolbarInnerLayout;
-  @Nullable
-  private View mSave;
 
   enum Mode
   {
@@ -135,10 +131,7 @@ public class EditorHostFragment extends BaseMwmToolbarFragment
   {
     super.onViewCreated(view, savedInstanceState);
 
-    final View toolbar = getToolbarController().getToolbar();
-    mToolbarInnerLayout = toolbar.findViewById(R.id.toolbar_inner_layout);
-    mSave = toolbar.findViewById(R.id.save);
-    mSave.setOnClickListener(this);
+    getToolbarController().getToolbar().findViewById(R.id.save).setOnClickListener(this);
     UiUtils.setupHomeUpButtonAsNavigationIcon(getToolbarController().getToolbar(),
                                               v -> onBackPressed());
 
@@ -203,7 +196,7 @@ public class EditorHostFragment extends BaseMwmToolbarFragment
   protected void editMapObject(boolean focusToLastName)
   {
     mMode = Mode.MAP_OBJECT;
-    showSearchControls(false);
+    ((SearchToolbarController) getToolbarController()).showSearchControls(false);
     getToolbarController().setTitle(getTitle());
     UiUtils.show(getToolbarController().getToolbar().findViewById(R.id.save));
     Bundle args = new Bundle();
@@ -256,7 +249,7 @@ public class EditorHostFragment extends BaseMwmToolbarFragment
 
     mMode = newMode;
     getToolbarController().setTitle(toolbarTitle);
-    showSearchControls(showSearch);
+    ((SearchToolbarController) getToolbarController()).showSearchControls(showSearch);
     final Fragment fragment = Fragment.instantiate(getActivity(), fragmentClass.getName(), args);
     getChildFragmentManager().beginTransaction()
                              .replace(R.id.fragment_container, fragment, fragmentClass.getName())
@@ -271,18 +264,6 @@ public class EditorHostFragment extends BaseMwmToolbarFragment
     final Activity host = getActivity();
     host.finish();
     startActivity(new Intent(host, FeatureCategoryActivity.class));
-  }
-
-  private void showSearchControls(boolean showSearch)
-  {
-    ((SearchToolbarController) getToolbarController()).showSearchControls(showSearch);
-    if (mToolbarInnerLayout != null && mSave != null)
-    {
-      // Make room for the toolbar title if the search controls are hidden.
-      mToolbarInnerLayout.getLayoutParams().width = showSearch
-              ? ViewGroup.LayoutParams.MATCH_PARENT
-              : mSave.getLayoutParams().width;
-    }
   }
 
   private boolean setEdits()
